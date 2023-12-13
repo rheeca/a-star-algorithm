@@ -72,30 +72,29 @@ func (g *Game) Update() error {
 				continue
 			}
 
-			currCell := astar.GetCell(c.XLoc, c.YLoc)
-			if nextCell.X == currCell.X && nextCell.Y == currCell.Y {
+			if nextCell.X*32 == c.XLoc && nextCell.Y*32 == c.YLoc {
 				g.Chickens[i].Path.Next()
 				continue
 			}
 
-			if nextCell.X < currCell.X {
+			if nextCell.X*32 < c.XLoc {
 				// walk left
 				g.Chickens[i].Direction = utils.ChickenLeft
 				g.Chickens[i].State = utils.ChickenWalkState
 				g.Chickens[i].Dx -= utils.ChickenMovementSpeed
 				g.Chickens[i].UpdateLocation()
-			} else if nextCell.X > currCell.X {
+			} else if nextCell.X*32 > c.XLoc {
 				// walk right
 				g.Chickens[i].Direction = utils.ChickenRight
 				g.Chickens[i].State = utils.ChickenWalkState
 				g.Chickens[i].Dx += utils.ChickenMovementSpeed
 				g.Chickens[i].UpdateLocation()
-			} else if nextCell.Y < currCell.Y {
+			} else if nextCell.Y*32 < c.YLoc {
 				// walk down
 				g.Chickens[i].State = utils.ChickenWalkState
 				g.Chickens[i].Dy -= utils.ChickenMovementSpeed
 				g.Chickens[i].UpdateLocation()
-			} else if nextCell.Y > currCell.Y {
+			} else if nextCell.Y*32 > c.YLoc {
 				// walk up
 				g.Chickens[i].State = utils.ChickenWalkState
 				g.Chickens[i].Dy += utils.ChickenMovementSpeed

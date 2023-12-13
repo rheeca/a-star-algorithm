@@ -103,8 +103,11 @@ func (c *Chicken) UpdateFrame(currentFrame int) {
 }
 
 func (c *Chicken) SetPath(g *Game, x, y int) {
-	originCell := astar.GetCell(c.XLoc, c.YLoc)
-	destCell := astar.GetCell(g.Player.Sprite.X, g.Player.Sprite.Y)
+	cx, cy := c.GetCenterPoint()
+	px, py := g.Player.GetCenterPoint()
+	originCell := astar.GetCell(cx, cy)
+	destCell := astar.GetCell(px, py)
+
 	c.Path = astar.AStar(g.GridMap, originCell, destCell)
 }
 
@@ -148,6 +151,10 @@ func (p *Player) UpdateLocation() {
 
 func (p *Player) GetCenterPoint() (x, y int) {
 	return (p.Sprite.X + p.Sprite.Width/2), (p.Sprite.Y + p.Sprite.Height - 8)
+}
+
+func (c *Chicken) GetCenterPoint() (x, y int) {
+	return (c.Sprite.X + c.Sprite.Width/2), (c.Sprite.Y + c.Sprite.Height/2)
 }
 
 func (p *Player) Restart(g *Game) {

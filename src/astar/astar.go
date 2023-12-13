@@ -3,6 +3,7 @@ package astar
 import (
 	"a-star/src/utils"
 	"container/heap"
+	"fmt"
 	"math"
 
 	"github.com/lafriks/go-tiled"
@@ -259,6 +260,28 @@ func NewGridMap(gameMap *tiled.Map) *GridMap {
 	gridMap.Height = len(gridMap.Cells)
 
 	return gridMap
+}
+
+func (m *GridMap) PrintMap() {
+	for y := range m.Cells {
+		for _, cell := range m.Cells[y] {
+			fmt.Print(fmt.Sprintf("%v,%v|", cell.X, cell.Y))
+		}
+		fmt.Println("")
+	}
+}
+
+func (m *GridMap) PrintCost() {
+	for y := range m.Cells {
+		for _, cell := range m.Cells[y] {
+			if cell.IsWalkable {
+				fmt.Print("0 ")
+			} else {
+				fmt.Print("1 ")
+			}
+		}
+		fmt.Println("")
+	}
 }
 
 func (m *GridMap) GetGridCell(x, y int) *Cell {
