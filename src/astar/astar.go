@@ -29,6 +29,14 @@ type Node struct {
 	h      float64 // heuristic
 }
 
+type GridMap struct {
+	Cells      [][]*Cell
+	Width      int
+	Height     int
+	CellWidth  int
+	CellHeight int
+}
+
 func AStar(m *GridMap, originCell, destCell *Cell) (path *Path) {
 	var open PriorityQueue
 	closed := []*Node{}
@@ -64,25 +72,25 @@ func AStar(m *GridMap, originCell, destCell *Cell) (path *Path) {
 		// cell to the left of q
 		cell = m.GetGridCell(q.Cell.X-1, q.Cell.Y)
 		if cell != nil && cell.IsWalkable {
-			AddNeighboringCell(cell, destCell, q, &closed, &open)
+			AddNeighboringNode(cell, destCell, q, &closed, &open)
 		}
 
 		// cell to the right of q
 		cell = m.GetGridCell(q.Cell.X+1, q.Cell.Y)
 		if cell != nil && cell.IsWalkable {
-			AddNeighboringCell(cell, destCell, q, &closed, &open)
+			AddNeighboringNode(cell, destCell, q, &closed, &open)
 		}
 
 		// cell below q
 		cell = m.GetGridCell(q.Cell.X, q.Cell.Y-1)
 		if cell != nil && cell.IsWalkable {
-			AddNeighboringCell(cell, destCell, q, &closed, &open)
+			AddNeighboringNode(cell, destCell, q, &closed, &open)
 		}
 
 		// cell above q
 		cell = m.GetGridCell(q.Cell.X, q.Cell.Y+1)
 		if cell != nil && cell.IsWalkable {
-			AddNeighboringCell(cell, destCell, q, &closed, &open)
+			AddNeighboringNode(cell, destCell, q, &closed, &open)
 		}
 
 		closed = append(closed, q)
@@ -91,7 +99,7 @@ func AStar(m *GridMap, originCell, destCell *Cell) (path *Path) {
 	return nil
 }
 
-func AddNeighboringCell(cell, destCell *Cell, q *Node, closed *[]*Node, open *PriorityQueue) {
+func AddNeighboringNode(cell, destCell *Cell, q *Node, closed *[]*Node, open *PriorityQueue) {
 	n := &Node{
 		Cell:   cell,
 		Parent: q,
@@ -118,6 +126,11 @@ func AddNeighboringCell(cell, destCell *Cell, q *Node, closed *[]*Node, open *Pr
 	}
 }
 
+func Heuristic(cell, destCell *Cell) float64 {
+	// Manhattan distance
+	return math.Abs(float64(destCell.X-cell.X)) + math.Abs(float64(destCell.Y-cell.Y))
+}
+
 func (p *Path) GetCurrentCell() *Cell {
 	if p.CurrentCell >= len(p.Cells) {
 		return nil
@@ -127,14 +140,6 @@ func (p *Path) GetCurrentCell() *Cell {
 
 func (p *Path) Next() {
 	p.CurrentCell += 1
-}
-
-type GridMap struct {
-	Cells      [][]*Cell
-	Width      int
-	Height     int
-	CellWidth  int
-	CellHeight int
 }
 
 func NewGridMap(gameMap *tiled.Map) *GridMap {
@@ -186,11 +191,6 @@ func (m *GridMap) GetGridCell(x, y int) *Cell {
 		return nil
 	}
 	return m.Cells[y][x]
-}
-
-func Heuristic(cell, destCell *Cell) float64 {
-	// Manhattan distance
-	return math.Abs(float64(destCell.X-cell.X)) + math.Abs(float64(destCell.Y-cell.Y))
 }
 
 func GetCell(x, y int) (cell *Cell) {

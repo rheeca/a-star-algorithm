@@ -86,22 +86,6 @@ func NewChickens(embeddedAssets embed.FS, gameMap *tiled.Map) []*Chicken {
 	return chickens
 }
 
-func (c *Chicken) UpdateFrame(currentFrame int) {
-	if currentFrame%utils.ChickenFrameDelay == 0 {
-		if c.StateTTL > 1 {
-			c.StateTTL -= 1
-		} else if c.StateTTL == 1 {
-			c.StateTTL -= 1
-			c.State = utils.IdleState
-		}
-
-		c.Frame += 1
-		if c.Frame >= utils.ChickenFrameCount {
-			c.Frame = 0
-		}
-	}
-}
-
 func (c *Chicken) SetPath(g *Game, x, y int) {
 	cx, cy := c.GetCenterPoint()
 	px, py := g.Player.GetCenterPoint()
@@ -109,17 +93,6 @@ func (c *Chicken) SetPath(g *Game, x, y int) {
 	destCell := astar.GetCell(px, py)
 
 	c.Path = astar.AStar(g.GridMap, originCell, destCell)
-}
-
-func (c *Chicken) UpdateLocation() {
-	c.XLoc += c.Dx
-	c.YLoc += c.Dy
-	c.Sprite.X += c.Dx
-	c.Sprite.Y += c.Dy
-	c.Collision.X += c.Dx
-	c.Collision.Y += c.Dy
-	c.Dx = 0
-	c.Dy = 0
 }
 
 func (p *Player) UpdateFrame(currentFrame int) {
@@ -138,6 +111,22 @@ func (p *Player) UpdateFrame(currentFrame int) {
 	}
 }
 
+func (c *Chicken) UpdateFrame(currentFrame int) {
+	if currentFrame%utils.ChickenFrameDelay == 0 {
+		if c.StateTTL > 1 {
+			c.StateTTL -= 1
+		} else if c.StateTTL == 1 {
+			c.StateTTL -= 1
+			c.State = utils.IdleState
+		}
+
+		c.Frame += 1
+		if c.Frame >= utils.ChickenFrameCount {
+			c.Frame = 0
+		}
+	}
+}
+
 func (p *Player) UpdateLocation() {
 	p.XLoc += p.Dx
 	p.YLoc += p.Dy
@@ -147,6 +136,17 @@ func (p *Player) UpdateLocation() {
 	p.Collision.Y += p.Dy
 	p.Dx = 0
 	p.Dy = 0
+}
+
+func (c *Chicken) UpdateLocation() {
+	c.XLoc += c.Dx
+	c.YLoc += c.Dy
+	c.Sprite.X += c.Dx
+	c.Sprite.Y += c.Dy
+	c.Collision.X += c.Dx
+	c.Collision.Y += c.Dy
+	c.Dx = 0
+	c.Dy = 0
 }
 
 func (p *Player) GetCenterPoint() (x, y int) {

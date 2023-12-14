@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.10.2" orientation="orthogonal" renderorder="right-down" width="30" height="20" tilewidth="32" tileheight="32" infinite="0" nextlayerid="8" nextobjectid="21">
+<map version="1.10" tiledversion="1.10.2" orientation="orthogonal" renderorder="right-down" width="30" height="20" tilewidth="32" tileheight="32" infinite="0" nextlayerid="8" nextobjectid="23">
  <tileset firstgid="1" name="grass_hill" tilewidth="32" tileheight="32" tilecount="77" columns="11">
   <image source="grass_hill.png" width="352" height="224"/>
  </tileset>
@@ -59,11 +59,6 @@
    <point/>
   </object>
  </objectgroup>
- <objectgroup id="7" name="OneChicken">
-  <object id="20" x="864" y="352">
-   <point/>
-  </object>
- </objectgroup>
  <objectgroup id="6" name="ChickenSpawnPoints">
   <object id="14" x="800" y="128">
    <point/>
@@ -78,6 +73,14 @@
    <point/>
   </object>
   <object id="19" x="64" y="512">
+   <point/>
+  </object>
+  <object id="21" x="864" y="352">
+   <point/>
+  </object>
+ </objectgroup>
+ <objectgroup id="7" name="OneChicken">
+  <object id="20" x="864" y="352">
    <point/>
   </object>
  </objectgroup>
