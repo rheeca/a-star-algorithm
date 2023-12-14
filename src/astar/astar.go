@@ -29,17 +29,6 @@ type Node struct {
 	h      float64 // heuristic
 }
 
-func (p *Path) GetCurrentCell() *Cell {
-	if p.CurrentCell >= len(p.Cells) {
-		return nil
-	}
-	return p.Cells[p.CurrentCell]
-}
-
-func (p *Path) Next() {
-	p.CurrentCell += 1
-}
-
 func AStar(m *GridMap, originCell, destCell *Cell) (path *Path) {
 	var open PriorityQueue
 	closed := []*Node{}
@@ -49,7 +38,9 @@ func AStar(m *GridMap, originCell, destCell *Cell) (path *Path) {
 	originNode := &Node{
 		Cell: originCell,
 		g:    originCell.Cost,
+		h:    Heuristic(originCell, destCell),
 	}
+	originNode.f = originNode.g + originNode.h
 	originNode.Parent = originNode
 	heap.Push(&open, originNode)
 	openList = append(openList, originNode)
@@ -76,125 +67,25 @@ func AStar(m *GridMap, originCell, destCell *Cell) (path *Path) {
 		// cell to the left of q
 		cell = m.GetGridCell(q.Cell.X-1, q.Cell.Y)
 		if cell != nil && cell.IsWalkable {
-			n := &Node{
-				Cell:   cell,
-				Parent: q,
-				g:      q.g + cell.Cost,
-				h:      Heuristic(cell, destCell),
-			}
-			n.f = n.g + n.h
-
-			if !Contains(closed, n.Cell) && !Contains(openList, n.Cell) {
-				heap.Push(&open, n)
-				openList = append(openList, n)
-			} else if Contains(openList, n.Cell) && n.g > q.g+n.Cell.Cost {
-				// if current cost is better than previous cost, change to current path
-				openNode := GetFromList(openList, n.Cell)
-				openNode.Parent = n.Parent
-				openNode.f = n.f
-				openNode.g = n.g
-				openNode.h = n.h
-			} else if Contains(closed, n.Cell) && n.g > q.g+n.Cell.Cost {
-				// if current cost is better than previous cost, revisit node
-				closed = Remove(closed, n.Cell)
-
-				// add to open list
-				heap.Push(&open, n)
-				openList = append(openList, n)
-			}
+			AddNeighboringCell(cell, destCell, q, &openList, &closed, &open)
 		}
 
 		// cell to the right of q
 		cell = m.GetGridCell(q.Cell.X+1, q.Cell.Y)
 		if cell != nil && cell.IsWalkable {
-			n := &Node{
-				Cell:   cell,
-				Parent: q,
-				g:      q.g + cell.Cost,
-				h:      Heuristic(cell, destCell),
-			}
-			n.f = n.g + n.h
-
-			if !Contains(closed, n.Cell) && !Contains(openList, n.Cell) {
-				heap.Push(&open, n)
-				openList = append(openList, n)
-			} else if Contains(openList, n.Cell) && n.g > q.g+n.Cell.Cost {
-				// if current cost is better than previous cost, change to current path
-				openNode := GetFromList(openList, n.Cell)
-				openNode.Parent = n.Parent
-				openNode.f = n.f
-				openNode.g = n.g
-				openNode.h = n.h
-			} else if Contains(closed, n.Cell) && n.g > q.g+n.Cell.Cost {
-				// if current cost is better than previous cost, revisit node
-				closed = Remove(closed, n.Cell)
-
-				// add to open list
-				heap.Push(&open, n)
-				openList = append(openList, n)
-			}
+			AddNeighboringCell(cell, destCell, q, &openList, &closed, &open)
 		}
 
 		// cell below q
 		cell = m.GetGridCell(q.Cell.X, q.Cell.Y-1)
 		if cell != nil && cell.IsWalkable {
-			n := &Node{
-				Cell:   cell,
-				Parent: q,
-				g:      q.g + cell.Cost,
-				h:      Heuristic(cell, destCell),
-			}
-			n.f = n.g + n.h
-
-			if !Contains(closed, n.Cell) && !Contains(openList, n.Cell) {
-				heap.Push(&open, n)
-				openList = append(openList, n)
-			} else if Contains(openList, n.Cell) && n.g > q.g+n.Cell.Cost {
-				// if current cost is better than previous cost, change to current path
-				openNode := GetFromList(openList, n.Cell)
-				openNode.Parent = n.Parent
-				openNode.f = n.f
-				openNode.g = n.g
-				openNode.h = n.h
-			} else if Contains(closed, n.Cell) && n.g > q.g+n.Cell.Cost {
-				// if current cost is better than previous cost, revisit node
-				closed = Remove(closed, n.Cell)
-
-				// add to open list
-				heap.Push(&open, n)
-				openList = append(openList, n)
-			}
+			AddNeighboringCell(cell, destCell, q, &openList, &closed, &open)
 		}
 
 		// cell above q
 		cell = m.GetGridCell(q.Cell.X, q.Cell.Y+1)
 		if cell != nil && cell.IsWalkable {
-			n := &Node{
-				Cell:   cell,
-				Parent: q,
-				g:      q.g + cell.Cost,
-				h:      Heuristic(cell, destCell),
-			}
-			n.f = n.g + n.h
-
-			if !Contains(closed, n.Cell) && !Contains(openList, n.Cell) {
-				heap.Push(&open, n)
-				openList = append(openList, n)
-			} else if Contains(openList, n.Cell) && n.g > q.g+n.Cell.Cost {
-				// if current cost is better than previous cost, change to current path
-				openNode := GetFromList(openList, n.Cell)
-				openNode.Parent = n.Parent
-				openNode.f = n.f
-				openNode.g = n.g
-				openNode.h = n.h
-			} else if Contains(closed, n.Cell) && n.g > q.g+n.Cell.Cost {
-				// if current cost is better than previous cost, revisit node
-				closed = Remove(closed, n.Cell)
-
-				// add to open list
-				heap.Push(&open, n)
-				openList = append(openList, n)
-			}
+			AddNeighboringCell(cell, destCell, q, &openList, &closed, &open)
 		}
 
 		closed = append(closed, q)
@@ -203,7 +94,7 @@ func AStar(m *GridMap, originCell, destCell *Cell) (path *Path) {
 	return nil
 }
 
-func AddNeighboringCell(cell, destCell *Cell, q *Node, openList, closed []*Node, open PriorityQueue) {
+func AddNeighboringCell(cell, destCell *Cell, q *Node, openList, closed *[]*Node, open *PriorityQueue) {
 	n := &Node{
 		Cell:   cell,
 		Parent: q,
@@ -212,24 +103,35 @@ func AddNeighboringCell(cell, destCell *Cell, q *Node, openList, closed []*Node,
 	}
 	n.f = n.g + n.h
 
-	if !Contains(closed, n.Cell) && !Contains(openList, n.Cell) {
-		heap.Push(&open, n)
-		openList = append(openList, n)
-	} else if Contains(openList, n.Cell) && n.g > q.g+n.Cell.Cost {
+	if !Contains(*closed, n.Cell) && !Contains(*openList, n.Cell) {
+		heap.Push(open, n)
+		*openList = append(*openList, n)
+	} else if Contains(*openList, n.Cell) && n.g > q.g+n.Cell.Cost {
 		// if current cost is better than previous cost, change to current path
-		openNode := GetFromList(openList, n.Cell)
+		openNode := GetFromList(*openList, n.Cell)
 		openNode.Parent = n.Parent
 		openNode.f = n.f
 		openNode.g = n.g
 		openNode.h = n.h
-	} else if Contains(closed, n.Cell) && n.g > q.g+n.Cell.Cost {
+	} else if Contains(*closed, n.Cell) && n.g > q.g+n.Cell.Cost {
 		// if current cost is better than previous cost, revisit node
-		closed = Remove(closed, n.Cell)
+		*closed = Remove(*closed, n.Cell)
 
 		// add to open list
-		heap.Push(&open, n)
-		openList = append(openList, n)
+		heap.Push(open, n)
+		*openList = append(*openList, n)
 	}
+}
+
+func (p *Path) GetCurrentCell() *Cell {
+	if p.CurrentCell >= len(p.Cells) {
+		return nil
+	}
+	return p.Cells[p.CurrentCell]
+}
+
+func (p *Path) Next() {
+	p.CurrentCell += 1
 }
 
 type GridMap struct {

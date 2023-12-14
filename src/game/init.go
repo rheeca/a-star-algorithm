@@ -178,6 +178,9 @@ func getPlayerInput(g *Game) {
 			Height: 54,
 		}) {
 			g.Player.Restart(g)
+			for i, spawnPoint := range g.GameMap.ObjectGroups[utils.ChickenSpawnPoints].Objects {
+				g.Chickens[i].Restart(g, int(spawnPoint.X), int(spawnPoint.Y))
+			}
 		}
 	}
 }

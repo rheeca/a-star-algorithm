@@ -177,6 +177,23 @@ func (p *Player) Restart(g *Game) {
 	p.Frame = 0
 }
 
+func (c *Chicken) Restart(g *Game, x, y int) {
+	c.XLoc = x
+	c.YLoc = y
+	c.Sprite.X = x
+	c.Sprite.Y = y
+	c.Collision.X = x
+	c.Collision.Y = y
+
+	c.Dx = 0
+	c.Dy = 0
+	c.State = 0
+	c.StateTTL = 0
+	c.Direction = 0
+	c.Frame = 0
+	c.Path = nil
+}
+
 type CollisionBody struct {
 	X      int
 	Y      int
