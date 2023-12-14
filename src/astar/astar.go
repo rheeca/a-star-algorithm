@@ -32,7 +32,6 @@ type Node struct {
 func AStar(m *GridMap, originCell, destCell *Cell) (path *Path) {
 	var open PriorityQueue
 	closed := []*Node{}
-	openList := []*Node{}
 
 	// create origin node and add to the open queuee
 	originNode := &Node{
@@ -43,12 +42,10 @@ func AStar(m *GridMap, originCell, destCell *Cell) (path *Path) {
 	originNode.f = originNode.g + originNode.h
 	originNode.Parent = originNode
 	heap.Push(&open, originNode)
-	openList = append(openList, originNode)
 
 	// repeat until there are no more open nodes to check
 	for len(open) > 0 {
 		q := heap.Pop(&open).(*Node)
-		openList = Remove(openList, q.Cell)
 
 		// if destination has been reached, reconstruct path and return
 		if q.Cell.X == destCell.X && q.Cell.Y == destCell.Y {
@@ -67,25 +64,25 @@ func AStar(m *GridMap, originCell, destCell *Cell) (path *Path) {
 		// cell to the left of q
 		cell = m.GetGridCell(q.Cell.X-1, q.Cell.Y)
 		if cell != nil && cell.IsWalkable {
-			AddNeighboringCell(cell, destCell, q, &openList, &closed, &open)
+			AddNeighboringCell(cell, destCell, q, &closed, &open)
 		}
 
 		// cell to the right of q
 		cell = m.GetGridCell(q.Cell.X+1, q.Cell.Y)
 		if cell != nil && cell.IsWalkable {
-			AddNeighboringCell(cell, destCell, q, &openList, &closed, &open)
+			AddNeighboringCell(cell, destCell, q, &closed, &open)
 		}
 
 		// cell below q
 		cell = m.GetGridCell(q.Cell.X, q.Cell.Y-1)
 		if cell != nil && cell.IsWalkable {
-			AddNeighboringCell(cell, destCell, q, &openList, &closed, &open)
+			AddNeighboringCell(cell, destCell, q, &closed, &open)
 		}
 
 		// cell above q
 		cell = m.GetGridCell(q.Cell.X, q.Cell.Y+1)
 		if cell != nil && cell.IsWalkable {
-			AddNeighboringCell(cell, destCell, q, &openList, &closed, &open)
+			AddNeighboringCell(cell, destCell, q, &closed, &open)
 		}
 
 		closed = append(closed, q)
@@ -94,7 +91,7 @@ func AStar(m *GridMap, originCell, destCell *Cell) (path *Path) {
 	return nil
 }
 
-func AddNeighboringCell(cell, destCell *Cell, q *Node, openList, closed *[]*Node, open *PriorityQueue) {
+func AddNeighboringCell(cell, destCell *Cell, q *Node, closed *[]*Node, open *PriorityQueue) {
 	n := &Node{
 		Cell:   cell,
 		Parent: q,
@@ -103,12 +100,11 @@ func AddNeighboringCell(cell, destCell *Cell, q *Node, openList, closed *[]*Node
 	}
 	n.f = n.g + n.h
 
-	if !Contains(*closed, n.Cell) && !Contains(*openList, n.Cell) {
+	if !Contains(*closed, n.Cell) && !Contains(*open, n.Cell) {
 		heap.Push(open, n)
-		*openList = append(*openList, n)
-	} else if Contains(*openList, n.Cell) && n.g > q.g+n.Cell.Cost {
+	} else if Contains(*open, n.Cell) && n.g > q.g+n.Cell.Cost {
 		// if current cost is better than previous cost, change to current path
-		openNode := GetFromList(*openList, n.Cell)
+		openNode := GetFromList(*open, n.Cell)
 		openNode.Parent = n.Parent
 		openNode.f = n.f
 		openNode.g = n.g
@@ -119,7 +115,6 @@ func AddNeighboringCell(cell, destCell *Cell, q *Node, openList, closed *[]*Node
 
 		// add to open list
 		heap.Push(open, n)
-		*openList = append(*openList, n)
 	}
 }
 
